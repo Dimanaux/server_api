@@ -20,4 +20,6 @@ from api import views
 
 urlpatterns = [
     # pass
+url(r'users/', views.UserList.as_view(),name='user-list'),
+url(r'records/', views.RecordList.as_view(),name='records-list')
 ]
