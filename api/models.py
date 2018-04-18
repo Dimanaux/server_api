@@ -22,9 +22,13 @@ class Company(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    is_company_manager = False
+    is_company_manager = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.user)
 
 
+'''
 # service functions
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -36,6 +40,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+'''
 
 
 # objects
