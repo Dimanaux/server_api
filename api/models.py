@@ -12,10 +12,10 @@ from django.dispatch import receiver
 
 
 class Company(models.Model):
-    name = models.CharField(max_length=16)
+    company_name = models.CharField(max_length=16)
 
     def __str__(self):
-        return str(self.name)
+        return str(self.company_name)
 
 
 # User
@@ -26,7 +26,7 @@ class Profile(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        username = self.user.username
+        self.username = self.user.username
 
     def __str__(self):
         return str(self.user)

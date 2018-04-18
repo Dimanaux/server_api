@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'company', 'is_company_manager')
+        fields = ('id', 'username', 'company', 'is_company_manager')
 
 
 class GroupSerializer(serializers.ModelSerializer):
