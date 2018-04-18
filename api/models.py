@@ -24,6 +24,10 @@ class Profile(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     is_company_manager = models.BooleanField(default=False)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        username = self.user.username
+
     def __str__(self):
         return str(self.user)
 

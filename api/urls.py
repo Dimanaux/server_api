@@ -17,9 +17,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf.urls import url
+from rest_framework_jwt.views import obtain_jwt_token
 
 from api import views
 
+
 urlpatterns = [
-    # pass
+    url(r'users/', views.UserList.as_view(), name='user-list'),
+    url(r'records/', views.RecordList.as_view(), name='records-list'),
+    url(r'^api-token-auth/', obtain_jwt_token),
 ]
