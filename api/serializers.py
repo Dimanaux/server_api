@@ -24,13 +24,20 @@ class GroupSerializer(serializers.ModelSerializer):
 class RecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Record
-        fields = ('id', 'user', 'game', 'score')
+        fields = (
+            'id',
+            'user',
+            'game',
+            'score',
+            # 'date',
+        )
 
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
         fields = ('id', 'title')
+
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:

@@ -66,4 +66,4 @@ class Record(models.Model):
         return self.date >= timezone.now() - datetime.timedelta(days=1)
 
     def __str__(self):
-        return ' '.join(str(self.game) + str(self.user) + str(self.score))
+        return ' '.join([str(self.game), str(self.user), str(self.score)])
