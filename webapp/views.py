@@ -1,5 +1,7 @@
 import sqlite3
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.messages import api
 from django.shortcuts import render
 
 from django.shortcuts import render, redirect, HttpResponse
@@ -10,8 +12,16 @@ from django.contrib.auth.models import User
 from api.models import Profile, Company
 
 
-def my_profile():
-    pass
+@login_required(redirect_field_name='login')
+def my_profile(request):
+    user = auth.get_user(request)
+
+
+    profile = Profile.objects.get(user=user)
+    context = {'company':profile.company.company_name, 'username': profile.username}
+
+    return render(request, 'webapp/my_profile.html', context)
+
 
 
 @csrf_exempt
@@ -22,16 +32,16 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('my_profile', request)
+            return redirect('my_profile')
         else:
-            return render(request, "loginsys/login.html")
+            return render(request, "webapp/login.html")
     else:
-        return render(request, 'loginsys/login.html')
+        return render(request, 'webapp/login.html')
 
 
 def logout(request):
     auth.logout(request)
-    return redirect('login', request)
+    return redirect('login')
 
 
 # @csrf_exempt
@@ -54,8 +64,13 @@ def register(request):
         is_company_manager = request.POST.get('is_company_manager', False)
         company_name = request.POST.get('company_name', 'Train Rabbits')
 
-        company = Company.objects.get(company_name=company_name)
-        user = User(username=username, email=email, password=password1)
+        try:
+            company = Company.objects.get(company_name=company_name)
+        except api.models.DoesNotExist:
+            company = Company(company_name)
+            company.save()
+
+        user = User.objects.create(username=username, email=email, password=password1)
         profile = Profile(user=user, company=company, is_company_manager=is_company_manager)
 
         try:
@@ -67,7 +82,8 @@ def register(request):
         user = auth.authenticate(username=username, password=password1)
         if user is not None:
             auth.login(request, user)
-            return redirect('register')
+            # return redirect('my_profile')
+            return redirect('my_profile')
         else:
             return render(request, "webapp/registration.html")
     else:
