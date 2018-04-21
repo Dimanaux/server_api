@@ -12,7 +12,7 @@ from django.dispatch import receiver
 
 
 class Company(models.Model):
-    company_name = models.CharField(max_length=16)
+    company_name = models.CharField(max_length=16,default="Train Rabbits")
 
     def __str__(self):
         return str(self.company_name)
