@@ -16,7 +16,6 @@ from api.models import Profile, Company
 def my_profile(request):
     user = auth.get_user(request)
 
-
     profile = Profile.objects.get(user=user)
     context = {'company':profile.company.company_name, 'username': profile.username}
 
@@ -70,7 +69,7 @@ def register(request):
             company = Company(company_name)
             company.save()
 
-        user = User.objects.create(username=username, email=email, password=password1)
+        user = User.objects.create_user(username=username, email=email, password=password1)
         profile = Profile(user=user, company=company, is_company_manager=is_company_manager)
 
         try:
@@ -82,7 +81,6 @@ def register(request):
         user = auth.authenticate(username=username, password=password1)
         if user is not None:
             auth.login(request, user)
-            # return redirect('my_profile')
             return redirect('my_profile')
         else:
             return render(request, "webapp/registration.html")
