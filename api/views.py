@@ -28,6 +28,46 @@ class RegistrateUser(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
+# class CreateRecord(APIView):
+#     serializer_class = RecordSerializer
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request, *args, **kwargs):
+#
+#         # Todo: validation in serializer
+#
+#         data = request.data
+#         user = self.request.user
+#         game = Game.objects.get(data['game'])
+#         score = data['score']
+#         serializer = self.serializer_class(user=user,game=game,score=score)
+#         if serializer.is_valid(raise_exception=True):
+#             new_data = serializer.data
+#             return Response(new_data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MyRecordList(generics.ListCreateAPIView):
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        title = request.data['game']
+        records = Record.objects.filter(user=user)
+        records.filter(game__title=title)
+        if len(request.data) == 1:
+            quantity = 10
+        else:
+            quantity = request.data['quantity']
+        real_quantity = records.count()
+        if (real_quantity < quantity):
+            count = real_quantity
+
+        records = records.order_by('-score')[0:quantity]
+        serializer = RecordSerializer(records, many=True)
+        return Response(serializer.data)
+
+
 class RecordList(generics.ListCreateAPIView):
     # Todo: add game.title and username istead of game&user
 
@@ -45,7 +85,7 @@ class RecordList(generics.ListCreateAPIView):
         else:
             quantity = request.data['quantity']
         real_quantity = records.count()
-        if(real_quantity<quantity):
+        if real_quantity < quantity:
             count = real_quantity
 
         records = records.order_by('-score')[0:quantity]

@@ -11,8 +11,6 @@ jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
-
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -21,24 +19,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
+
     # company_name = serializers.CharField(allow_blank=True)
 
     class Meta:
         model = Profile
-        fields = ('pk','username', 'company', 'is_company_manager')
-
+        fields = ('pk', 'username', 'company', 'is_company_manager')
 
 
 class LoginSerializer(serializers.Serializer):
-
     username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=128, write_only=True)
-    token = serializers.CharField(max_length=255, read_only=True,allow_blank=True)
+    token = serializers.CharField(max_length=255, read_only=True, allow_blank=True)
 
     def validate(self, attrs):
         username = attrs['username']
         password = attrs['password']
-
 
         if username is None:
             raise serializers.ValidationError(
@@ -59,18 +55,18 @@ class LoginSerializer(serializers.Serializer):
 
         return attrs
 
-class RegistrateSerializer(serializers.ModelSerializer):
 
+class RegistrateSerializer(serializers.ModelSerializer):
     username = CharField()
     password1 = CharField(write_only=True)
     password2 = CharField(write_only=True)
     company_name = CharField()
     email = EmailField(label="Email Address")
-    token = CharField(allow_blank=True,read_only=True)
+    token = CharField(allow_blank=True, read_only=True)
 
     class Meta:
         model = Profile
-        fields = ('username', 'company_name', 'is_company_manager', 'password1', 'password2', 'email','token')
+        fields = ('username', 'company_name', 'is_company_manager', 'password1', 'password2', 'email', 'token')
 
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -97,7 +93,7 @@ class RegistrateSerializer(serializers.ModelSerializer):
         if Company.objects.filter(company_name=company_name).exists():
             company = Company.objects.get(company_name=company_name)
         else:
-            company = Company(company_name)
+            company = Company.objects.create(company_name)
             company.save()
 
         payload = jwt_payload_handler(user)
@@ -110,8 +106,6 @@ class RegistrateSerializer(serializers.ModelSerializer):
 
 
 class RecordSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = Record
         fields = (
@@ -121,10 +115,20 @@ class RecordSerializer(serializers.ModelSerializer):
             # 'date',
         )
 
-    # def validate(self, attrs):
-    #     game = attrs['game']
-    #     attrs['game'] = game.title
-    #     return attrs
+    def create(self, validated_data):
+        # Todo:make creation WORK!
+        gameTitle = validated_data['game']
+        if type(gameTitle) == str:
+            game = Game.objects.get(gameTitle=gameTitle)
+        else:
+            game = gameTitle
+
+        user = validated_data['user']
+        score = validated_data['score']
+        record = Record.objects.create(game=game, user=user, score=score)
+        record.save()
+
+        return validated_data
 
 
 class GameSerializer(serializers.ModelSerializer):
