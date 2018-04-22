@@ -6,11 +6,14 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.contrib.auth.models import User
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser,AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import generics, mixins, status
 
-from api.models import Record
-from api.serializers import UserSerializer, RecordSerializer
-from rest_framework import generics
+from api.models import Record,Profile
+from api.serializers import UserSerializer, RecordSerializer, ProfileSerializer, RegistrateSerializer, LoginSerializer
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication,BaseJSONWebTokenAuthentication
 
 
 class UserList(generics.ListCreateAPIView):
@@ -18,11 +21,39 @@ class UserList(generics.ListCreateAPIView):
     serializer_class = UserSerializer
     # permission_classes = (IsAdminUser)
 
+# class MyProfile(generics.RetrieveAPIView):
+#     serializer_class = ProfileSerializer
+#     permission_classes = [AllowAny]
+#
+#
+#     def retrieve(self, request, *args, **kwargs):
+#         user = self.request.user
+#         profile = Profile.objects.get(user=user)
+#         serializer = self.serializer_class(profile)
+#         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class RegistrateUser(generics.CreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = RegistrateSerializer
+    permission_classes = [AllowAny]
+
 
 class RecordList(generics.ListCreateAPIView):
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
 
+class LoginAPIView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = LoginSerializer
+
+    def post(self,request,*args,**kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid(raise_exception=True):
+            new_data = serializer.data
+            return Response(new_data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 '''
 @login_required
