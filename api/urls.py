@@ -24,14 +24,14 @@ from rest_framework_jwt.views import obtain_jwt_token
 from api import views
 
 urlpatterns = [
-    url(r'^records', views.RecordList.as_view(), name='record-list'),
+    url(r'^records', views.RecordList.as_view(), name='record-list'),  # все рекорды
     # url(r'^auth/token', obtain_jwt_token),
-    url(r'new_record', views.CreateRecord.as_view()),
-    url(r'^my_profile', views.MyProfile.as_view(), name='my_profile'),
-    url(r'^my_records', views.MyRecordList.as_view(), name='my_records'),
+    # url(r'new_record', views.CreateRecord.as_view()),
+    url(r'^my_profile', views.MyProfile.as_view(), name='my_profile'),  # профиль юзера по токену
+    url(r'^my_records', views.MyRecordList.as_view(), name='my_records'),  # рекорды юзера по токену
     # url(r'^user', views.UserView.as_view(), name='user'),
-    url(r'^login', views.LoginAPIView.as_view(), name='login'),
+    url(r'^login', views.LoginAPIView.as_view(), name='login'),  # возвращает токен по username, password
     # url(r'^logout',views.LogoutAPIView.as_view(),name='logout'),
-    url(r'registration', views.RegistrateUser.as_view(), name='register'),
+    url(r'registration', views.RegistrateUser.as_view(), name='register'),  # возвращает токен
 
 ]
