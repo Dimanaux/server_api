@@ -20,9 +20,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    # company_name = serializers.CharField(allow_blank=True)
+
     class Meta:
         model = Profile
         fields = ('pk','username', 'company', 'is_company_manager')
+
 
 
 class LoginSerializer(serializers.Serializer):
