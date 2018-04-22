@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, mixins, status
 
-from api.models import Record, Profile
+from api.models import Record, Profile, Game
 from api.serializers import UserSerializer, RecordSerializer, ProfileSerializer, RegistrateSerializer, LoginSerializer
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication, BaseJSONWebTokenAuthentication
 
@@ -29,12 +29,31 @@ class RegistrateUser(generics.CreateAPIView):
 
 
 class RecordList(generics.ListCreateAPIView):
+    # Todo: add game.title and username istead of game&user
+
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+
+        title = request.data['game']
+        records = Record.objects.filter(game__title=title)
+
+        if len(request.data) == 1:
+            quantity = 10
+        else:
+            quantity = request.data['quantity']
+        real_quantity = records.count()
+        if(real_quantity<quantity):
+            count = real_quantity
+
+        records = records.order_by('-score')[0:quantity]
+        serializer = RecordSerializer(records, many=True)
+        return Response(serializer.data)
 
 
 class MyProfile(APIView):
-
     # Todo: add company_name field instead of company
 
     serializer_class = ProfileSerializer

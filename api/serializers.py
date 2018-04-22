@@ -110,15 +110,21 @@ class RegistrateSerializer(serializers.ModelSerializer):
 
 
 class RecordSerializer(serializers.ModelSerializer):
+
+
     class Meta:
         model = Record
         fields = (
-            'id',
             'user',
             'game',
             'score',
             # 'date',
         )
+
+    # def validate(self, attrs):
+    #     game = attrs['game']
+    #     attrs['game'] = game.title
+    #     return attrs
 
 
 class GameSerializer(serializers.ModelSerializer):

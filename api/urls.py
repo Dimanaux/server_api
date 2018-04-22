@@ -25,8 +25,9 @@ from api import views
 
 
 urlpatterns = [
-    url(r'^records', views.RecordList.as_view(), name='records-list'),
-    url(r'^auth/token', obtain_jwt_token),
+    url(r'^records', views.RecordList.as_view(), name='record-list'),
+    # url(r'^auth/token', obtain_jwt_token),
+
     url(r'^my_profile',views.MyProfile.as_view(),name='my_profile'),
     # url(r'^my_records',views.MyRecordList.as_view(),name='my_records'),
     # url(r'^user', views.UserView.as_view(), name='user'),
