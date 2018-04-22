@@ -6,5 +6,6 @@ urlpatterns = [
     url(r'^logout', logout, name='logout'),
     url(r'^login', login, name='login'),
     url(r'^registration', register, name='register'),
+    url(r'',my_profile),
 ]
 
