@@ -33,7 +33,7 @@ def login(request):
             auth.login(request, user)
             return redirect('my_profile')
         else:
-            return render(request, "webapp/login.html")
+            return render(request, "webapp/login.html",{'error':'неверный логин или пароль'})
     else:
         return render(request, 'webapp/login.html')
 
