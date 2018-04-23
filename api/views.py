@@ -9,67 +9,58 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 from rest_framework import generics, mixins, status
 
 from api.models import Record, Profile, Game
-from api.serializers import UserSerializer, RecordSerializer, ProfileSerializer, RegistrateSerializer, LoginSerializer
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication, BaseJSONWebTokenAuthentication
+from api.serializers import  RecordSerializer, ProfileSerializer, RegistrateSerializer, LoginSerializer, CreateRecordSerializer
 
 
-class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    # permission_classes = (IsAdminUser)
-
-
-class RegistrateUser(generics.CreateAPIView):
+class RegistrateUser(CreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = RegistrateSerializer
     permission_classes = [AllowAny]
 
 
-# class CreateRecord(APIView):
-#     serializer_class = RecordSerializer
-#     permission_classes = [AllowAny]
-#
-#     def post(self, request, *args, **kwargs):
-#
-#         # Todo: validation in serializer
-#
-#         data = request.data
-#         user = self.request.user
-#         game = Game.objects.get(data['game'])
-#         score = data['score']
-#         serializer = self.serializer_class(user=user,game=game,score=score)
-#         if serializer.is_valid(raise_exception=True):
-#             new_data = serializer.data
-#             return Response(new_data, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CreateRecord(CreateAPIView):
+    # Todo:data validation in serializer
+    serializer_class = CreateRecordSerializer
 
-class MyRecordList(generics.ListCreateAPIView):
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        game = request.data['game']
+        score = request.data['score']
+        game = Game.objects.get(id=game)
+        record = Record(user=user, game=game, score=score)
+        record.save()
+
+        return Response("succesfully created", status=status.HTTP_201_CREATED)
+
+
+class MyRecordList(generics.ListAPIView):
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
 
     def get(self, request, *args, **kwargs):
-        user = self.request.user
-        title = request.data['game']
-        records = Record.objects.filter(user=user)
-        records.filter(game__title=title)
+        user = request.user
+        game = request.data['game']
+        records = Record.objects.filter(user=user).filter(game_id=game)
         if len(request.data) == 1:
             quantity = 10
         else:
             quantity = request.data['quantity']
         real_quantity = records.count()
         if (real_quantity < quantity):
-            count = real_quantity
+            quantity = real_quantity
 
         records = records.order_by('-score')[0:quantity]
+
         serializer = RecordSerializer(records, many=True)
         return Response(serializer.data)
 
 
 class RecordList(generics.ListCreateAPIView):
-    # Todo: add game.title and username istead of game&user
+    # Todo: add game.title and username instead of game&user
 
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
@@ -77,8 +68,8 @@ class RecordList(generics.ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
 
-        title = request.data['game']
-        records = Record.objects.filter(game__title=title)
+        game = request.data['game']
+        records = Record.objects.filter(game__id=game)
 
         if len(request.data) == 1:
             quantity = 10
@@ -86,7 +77,7 @@ class RecordList(generics.ListCreateAPIView):
             quantity = request.data['quantity']
         real_quantity = records.count()
         if real_quantity < quantity:
-            count = real_quantity
+            quantity = real_quantity
 
         records = records.order_by('-score')[0:quantity]
         serializer = RecordSerializer(records, many=True)
@@ -94,14 +85,19 @@ class RecordList(generics.ListCreateAPIView):
 
 
 class MyProfile(APIView):
-    # Todo: add company_name field instead of company
 
     serializer_class = ProfileSerializer
 
     def get(self, request, *args, **kwargs):
         user = request.user
         profile = Profile.objects.get(user=user)
-        serializer = self.serializer_class(profile)
+        serializer = self.serializer_class({"pk": profile.pk, "username": profile.username, "company": profile.company,
+                                            "company_name": profile.company.company_name,
+                                            "is_company_manager": profile.is_company_manager})
+        # serializer = self.serializer_class({"username":profile.username,
+        # "company":profile.company.company_name,
+        # "is_company_manager":profile.is_company_manager})
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

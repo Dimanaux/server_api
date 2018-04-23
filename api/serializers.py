@@ -11,20 +11,15 @@ jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username')
-
-
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
-
-    # company_name = serializers.CharField(allow_blank=True)
+    company_name = serializers.CharField(allow_blank=True)
 
     class Meta:
         model = Profile
-        fields = ('pk', 'username', 'company', 'is_company_manager')
+        fields = ('pk', 'username', 'company', 'company_name', 'is_company_manager')
+
+        # fields = ('username', 'company','is_company_manager')
 
 
 class LoginSerializer(serializers.Serializer):
@@ -93,7 +88,7 @@ class RegistrateSerializer(serializers.ModelSerializer):
         if Company.objects.filter(company_name=company_name).exists():
             company = Company.objects.get(company_name=company_name)
         else:
-            company = Company.objects.create(company_name)
+            company = Company(company_name)
             company.save()
 
         payload = jwt_payload_handler(user)
@@ -115,29 +110,9 @@ class RecordSerializer(serializers.ModelSerializer):
             # 'date',
         )
 
-    def create(self, validated_data):
-        # Todo:make creation WORK!
-        gameTitle = validated_data['game']
-        if type(gameTitle) == str:
-            game = Game.objects.get(gameTitle=gameTitle)
-        else:
-            game = gameTitle
 
-        user = validated_data['user']
-        score = validated_data['score']
-        record = Record.objects.create(game=game, user=user, score=score)
-        record.save()
-
-        return validated_data
-
-
-class GameSerializer(serializers.ModelSerializer):
+class CreateRecordSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Game
-        fields = ('id', 'title')
+        model = Record
+        fields = ('game', 'user', 'score')
 
-
-class CompanySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = ('id', 'name')

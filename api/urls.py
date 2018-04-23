@@ -26,7 +26,7 @@ from api import views
 urlpatterns = [
     url(r'^records', views.RecordList.as_view(), name='record-list'),  # все рекорды
     # url(r'^auth/token', obtain_jwt_token),
-    # url(r'new_record', views.CreateRecord.as_view()),
+    url(r'^new_record', views.CreateRecord.as_view()),
     url(r'^my_profile', views.MyProfile.as_view(), name='my_profile'),  # профиль юзера по токену
     url(r'^my_records', views.MyRecordList.as_view(), name='my_records'),  # рекорды юзера по токену
     # url(r'^user', views.UserView.as_view(), name='user'),
