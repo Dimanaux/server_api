@@ -17,10 +17,9 @@ def my_profile(request):
     user = auth.get_user(request)
 
     profile = Profile.objects.get(user=user)
-    context = {'company':profile.company.company_name, 'username': profile.username}
+    context = {'company': profile.company.company_name, 'username': profile.username}
 
     return render(request, 'webapp/my_profile.html', context)
-
 
 
 @csrf_exempt
@@ -33,7 +32,7 @@ def login(request):
             auth.login(request, user)
             return redirect('my_profile')
         else:
-            return render(request, "webapp/login.html",{'error':'неверный логин или пароль'})
+            return render(request, "webapp/login.html", {'error': 'неверный логин или пароль'})
     else:
         return render(request, 'webapp/login.html')
 

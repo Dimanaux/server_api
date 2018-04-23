@@ -13,10 +13,12 @@ from rest_framework.generics import CreateAPIView
 from rest_framework import generics, mixins, status
 
 from api.models import Record, Profile, Game
-from api.serializers import  RecordSerializer, ProfileSerializer, RegistrateSerializer, LoginSerializer, CreateRecordSerializer
+from api.serializers import RecordSerializer, ProfileSerializer, RegistrateSerializer, LoginSerializer, \
+    CreateRecordSerializer
 
 
 class RegistrateUser(CreateAPIView):
+    # TODO: fix spelling mistakes
     queryset = Profile.objects.all()
     serializer_class = RegistrateSerializer
     permission_classes = [AllowAny]
@@ -28,30 +30,30 @@ class CreateRecord(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         user = request.user
-        game = request.data['game']
+        game_id = request.data['game']
         score = request.data['score']
-        game = Game.objects.get(id=game)
+        game = Game.objects.get(id=game_id)
         record = Record(user=user, game=game, score=score)
         record.save()
 
-        return Response("succesfully created", status=status.HTTP_201_CREATED)
+        return Response("successfully created", status=status.HTTP_201_CREATED)
 
 
 class MyRecordList(generics.ListAPIView):
+    # TODO: optimize attributes
+
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        game = request.data['game']
-        records = Record.objects.filter(user=user).filter(game_id=game)
-        if len(request.data) == 1:
-            quantity = 10
-        else:
-            quantity = request.data['quantity']
-        real_quantity = records.count()
-        if (real_quantity < quantity):
-            quantity = real_quantity
+        game_id = request.data['game']
+        records = Record.objects.filter(user=user).filter(game__id=game_id)
+
+        quantity = min(
+            records.count(),
+            request.data.get('quantity', 10),
+        )
 
         records = records.order_by('-score')[0:quantity]
 
@@ -60,24 +62,21 @@ class MyRecordList(generics.ListAPIView):
 
 
 class RecordList(generics.ListCreateAPIView):
-    # Todo: add game.title and username instead of game&user
-
+    # TODO: add game.title and username instead of game&user
+    # TODO: optimize attributes
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
 
-        game = request.data['game']
-        records = Record.objects.filter(game__id=game)
+        game_id = request.data['game']
+        records = Record.objects.filter(game__id=game_id)
 
-        if len(request.data) == 1:
-            quantity = 10
-        else:
-            quantity = request.data['quantity']
-        real_quantity = records.count()
-        if real_quantity < quantity:
-            quantity = real_quantity
+        quantity = min(
+            records.count(),
+            request.data.get('quantity', 10),
+        )
 
         records = records.order_by('-score')[0:quantity]
         serializer = RecordSerializer(records, many=True)
@@ -85,7 +84,6 @@ class RecordList(generics.ListCreateAPIView):
 
 
 class MyProfile(APIView):
-
     serializer_class = ProfileSerializer
 
     def get(self, request, *args, **kwargs):

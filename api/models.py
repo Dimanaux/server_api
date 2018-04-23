@@ -7,12 +7,13 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import models
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
 
 
 class Company(models.Model):
-    company_name = models.CharField(max_length=16,default="Train Rabbits")
+    company_name = models.CharField(max_length=16, default="Train Rabbits")
 
     def __str__(self):
         return str(self.company_name)
@@ -57,6 +58,7 @@ class Game(models.Model):
 
 # objects store information about every game played
 class Record(models.Model):
+    # TODO: why do records store User but not Profile
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)

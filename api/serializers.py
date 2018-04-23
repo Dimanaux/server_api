@@ -59,6 +59,8 @@ class RegistrateSerializer(serializers.ModelSerializer):
     email = EmailField(label="Email Address")
     token = CharField(allow_blank=True, read_only=True)
 
+    registrate = dict()
+
     class Meta:
         model = Profile
         fields = ('username', 'company_name', 'is_company_manager', 'password1', 'password2', 'email', 'token')
