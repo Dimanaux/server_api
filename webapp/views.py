@@ -11,7 +11,7 @@ from django.contrib import auth
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 
-from api.models import Profile, Company
+from api.models import Profile, Company, DEFAULT_COMPANY_NAME
 
 
 @login_required(redirect_field_name='login')
@@ -62,7 +62,9 @@ def register(request):
         password2 = request.POST.get('password2', '')
 
         is_company_manager = request.POST.get('is_company_manager', False)
-        company_name = request.POST.get('company_name', 'Train Rabbits')
+        company_name = request.POST.get('company_name', DEFAULT_COMPANY_NAME)
+        if company_name == '':
+            company_name = DEFAULT_COMPANY_NAME
 
         if Company.objects.filter(company_name=company_name).exists():
             company = Company.objects.get(company_name=company_name)

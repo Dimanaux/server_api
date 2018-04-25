@@ -8,12 +8,14 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+DEFAULT_COMPANY_NAME = 'Train Rabbits'
+
 # from django.db.models.signals import post_save
 # from django.dispatch import receiver
 
 
 class Company(models.Model):
-    company_name = models.CharField(max_length=16, default="Train Rabbits")
+    company_name = models.CharField(max_length=16, default=DEFAULT_COMPANY_NAME)
 
     def __str__(self):
         return str(self.company_name)
