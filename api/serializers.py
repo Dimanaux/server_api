@@ -17,9 +17,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('pk', 'username', 'company', 'company_name', 'is_company_manager')
-
-        # fields = ('username', 'company','is_company_manager')
+        fields = (
+            'pk',
+            'username',
+            # 'company',
+            'company_name',
+            'is_company_manager',
+        )
 
 
 class LoginSerializer(serializers.Serializer):
@@ -90,7 +94,7 @@ class RegistrateSerializer(serializers.ModelSerializer):
         if Company.objects.filter(company_name=company_name).exists():
             company = Company.objects.get(company_name=company_name)
         else:
-            company = Company(company_name)
+            company = Company(company_name=company_name)
             company.save()
 
         payload = jwt_payload_handler(user)

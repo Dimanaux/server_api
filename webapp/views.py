@@ -1,8 +1,10 @@
 import sqlite3
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.messages import api
+# from django.contrib.messages import api
 from django.shortcuts import render
+
+import api
 
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import auth
@@ -62,10 +64,10 @@ def register(request):
         is_company_manager = request.POST.get('is_company_manager', False)
         company_name = request.POST.get('company_name', 'Train Rabbits')
 
-        try:
+        if Company.objects.filter(company_name=company_name).exists():
             company = Company.objects.get(company_name=company_name)
-        except api.models.DoesNotExist:
-            company = Company(company_name)
+        else:
+            company = Company(company_name=company_name)
             company.save()
 
         user = User.objects.create_user(username=username, email=email, password=password1)
