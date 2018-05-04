@@ -24,6 +24,29 @@ def my_profile(request):
     return render(request, 'webapp/my_profile.html', context)
 
 
+@login_required(redirect_field_name='login')
+def my_records(request):
+    user = auth.get_user(request)
+
+    records = records.objects.filter(user=user)
+    context = {'records': records}
+
+    return render(request, 'webapp/my_records.html', context)
+
+
+@login_required(redirect_field_name='login')
+def new_record(request):
+    user = auth.get_user(request)
+
+    game_id = request.POST['game']
+    score = int(request.POST['score'])
+    record = Record(user=user, score=score, game=game_id)
+    record.save()
+
+    return HttpResponse('')
+
+
+
 @csrf_exempt
 def login(request):
     if request.POST:
